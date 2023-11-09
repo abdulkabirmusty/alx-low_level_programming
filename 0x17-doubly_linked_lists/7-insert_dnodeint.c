@@ -1,42 +1,54 @@
 #include "lists.h"
 
 /**
- * insert_dnodeint_at_index - This inserts a new node at a given position
- * @h: head node
- * @idx: position to insert node
- * @n: value of node
+ * insert_dnodeint_at_index - This inserts a new node at
+ * a given position
  *
- * Return: address of th new node
+ * @h: head of the list
+ * @idx: index of the new node
+ * @n: value of the new node
+ * Return: the address of the new node, or NULL if it failed
  */
 dlistint_t *insert_dnodeint_at_index(dlistint_t **h, unsigned int idx, int n)
 {
-	dlistint_t *dummy = *h, *new;
+	dlistint_t *new;
+	dlistint_t *head;
 	unsigned int i;
 
-	if (h == NULL)
-		return (NULL);
-	else if (idx == 0)
-		return (add_dnodeint(h, n));
-	new = malloc(sizeof(dlistint_t));
-	if (new == NULL)
-		return (NULL);
-	new->n = n;
-	new->next = NULL;
-	new->prev = NULL;
-	for (i = 0; dummy; i++)
+	new = NULL;
+	if (idx == 0)
+		new = add_dnodeint(h, n);
+	else
 	{
-		if (i == idx)
+		head = *h;
+		i = 1;
+		if (head != NULL)
+			while (head->prev != NULL)
+				head = head->prev;
+		while (head != NULL)
 		{
-			new->prev = dummy->prev;
-			new->next = dummy;
-			(dummy->prev)->next = new;
-			dummy->prev = new;
-			return (new);
+			if (i == idx)
+			{
+				if (head->next == NULL)
+					new = add_dnodeint_end(h, n);
+				else
+				{
+					new = malloc(sizeof(dlistint_t));
+					if (new != NULL)
+					{
+						new->n = n;
+						new->next = head->next;
+						new->prev = head;
+						head->next->prev = new;
+						head->next = new;
+					}
+				}
+				break;
+			}
+			head = head->next;
+			i++;
 		}
-		dummy = dummy->next;
 	}
-	if (i == idx)
-		add_dnodeint_end(h, n);
-	free(new);
-	return (NULL);
+
+	return (new);
 }
